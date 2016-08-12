@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -16,15 +17,20 @@ namespace ProjectEuler
             //Problem1.Answer();
             //Problem2.Answer();
             //LargestPrimeFactor_3.Answer();
-            //Problem4.Answer();
+            //SpecialPythagoreanTriplet_4.Answer();
 
             //Problem6.Answer();
             //ThousandAndFirstPrime.Answer();
             //Problem8.Answer();
             //Problem9.Answer();
             //SummationOfPrimes_10.Answer();
-            LargestProductInAGrid_11.Answer();
-            TriangleNumbers_12.Answer();
+            //LargestProductInAGrid_11.Answer();
+            //TriangleNumbers_12.Answer();
+            //LargeSum_13.Answer();
+            //LongestCollatzsSequence_14.Answer();
+            //LatticePaths_15.Answer();
+            //PowerDigitSum_16.Answer();
+            NumberLetterCounts_17.Answer();
             Console.Read();
         }
     }
@@ -470,8 +476,220 @@ namespace ProjectEuler
         }
     }
 
+    internal class LargeSum_13
+    {
+        public static string Answer()
+        {
+            var start = DateTime.Now;
+            List<string> numStrings = new List<string>();
+            using (var streamReader = new StreamReader("ProblemSpecificFiles/EulerProblem13.txt"))
+            {
+                while (!streamReader.EndOfStream)
+                {
+                    numStrings.Add(streamReader.ReadLine());
+                }
+            }
+
+            //Only need the first 12 digits to calculate the first 10 digits of the answer. 
+            // Digits less significant than that will not contribute.
+            var intList = numStrings.Select(ns => ulong.Parse(ns.Substring(0, 12)));
+
+            //var answer = intList.Aggregate(0ul, (total, next) => total + next).ToString().Substring(0, 10);
+            var answer = intList.Aggregate(0ul, (total, next) => total + next);
+            while (answer > 9999999999)
+            {
+                answer /= 10;
+            }
+
+            var answerText =
+                $"Problem 13 answer is '{answer}'. Algorithm finished in {Convert.ToInt64(DateTime.Now.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+            return answerText;
+        }
+    }
+
+    internal class LongestCollatzsSequence_14
+    {
+        public static void Answer()
+        {
+            var numArray = new int[2000000];
+            var start = DateTime.Now;
+            var answer = 1ul;
+            var length = 1;
+
+            for (uint num = 2; num < 1000000; num++)
+            {
+                var cLength = MathHelpers.FindCollatzsLength(num, numArray);
+                if (cLength > length)
+                {
+                    answer = num;
+                    length = cLength;
+                }
+                //if (num <= 101)
+                //{
+                //    numArray[num - 2] = cLength;
+                //}
+            }
+            
+            var answerText =
+                $"Problem 14 answer is '{answer}', length was '{length}'. Algorithm finished in {Convert.ToInt64(DateTime.Now.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+
+            //for (int x = 0; x < 100; x++)
+            //{
+            //    Debug.WriteLine($"{x+2}: {numArray[x]}");
+            //}
+        }
+    }
+
+    internal class LatticePaths_15
+    {
+        private static ulong[,] _gridPaths;
+        public static void Answer()
+        {
+            var gridSize = 20u;
+            _gridPaths = new ulong[gridSize + 1, gridSize + 1];
+            var start = DateTime.Now;
+            var answer = GetPathsRecursive(gridSize, gridSize);
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 15 answer is '{answer}' for grid size:{gridSize}. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+
+        }
+
+        private static ulong GetPathsRecursive(ulong x, ulong y)
+        {
+            if (x == 0 || y == 0)
+            {
+                return 1;
+            }
+
+            if (_gridPaths[x, y] != default(ulong))
+            {
+                return _gridPaths[x, y];
+            }
+
+            return _gridPaths[x, y] = GetPathsRecursive(x, y - 1) + GetPathsRecursive(x - 1, y);
+        }
+    }
+
+    internal class PowerDigitSum_16
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            BigInteger num = 1;
+            num <<= 1000;
+            var numString = num.ToString();
+            var total = 0;
+            foreach (var character in numString)
+            {
+                total += int.Parse(character.ToString());
+            }
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 16 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+
+        }
+    }
+
+    internal class NumberLetterCounts_17
+    {
+        private Dictionary<int, int> LettersPerNumber = new Dictionary<int, int>
+        {
+            {1, "one".Length},
+            {2, "two".Length},
+            {3, "three".Length},
+            {4, "four".Length},
+            {5, "five".Length},
+            {6, "six".Length},
+            {7, "seven".Length},
+            {8, "eight".Length},
+            {9, "nine".Length},
+            {10, "ten".Length},
+            {11, "eleven".Length},
+            {12, "twelve".Length},
+            {13, "thirteen".Length}
+        };
+
+        private static ulong CountLettersInNumber(uint number)
+        {
+            var total = 0ul;
+            
+            return total;
+        }
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            var total = 212%20;
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 16 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+
+        }
+    }
+
+    public struct U2DPoint
+    {
+        public U2DPoint(ulong x, ulong y)
+        {
+            X = x;
+            Y = y;
+        }
+        public ulong X { get; set; }
+        public ulong Y { get; set; }
+    }
+
     static class MathHelpers
     {
+        public static int FindCollatzsLength(ulong originalNum, int[] numArray)
+        {
+            var length = 1;
+            if (numArray[originalNum] != default(int))
+            {
+                return numArray[originalNum];
+            }
+
+            var num = originalNum;
+            var foundInArray = false;
+
+            while (num > 1)
+            {
+                if ((num & 1) == 0)
+                {
+                    num >>= 1;
+                }
+                else
+                {
+                    num = 3*num + 1;
+                }
+                if (num < (ulong)numArray.Length && numArray[num] != default(int))
+                {
+                    foundInArray = true;
+                    break;
+                }
+                ++length;
+            }
+
+            if (foundInArray)
+            {
+                numArray[originalNum] = length + numArray[num];
+                return length + numArray[num];
+            }
+            else
+            {
+                numArray[originalNum] = length;
+                return length;
+            }
+        }
         public static List<ulong> GetFactors(ulong num)
         {
             var list = new List<ulong> { 1 };
