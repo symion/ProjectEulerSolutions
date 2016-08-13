@@ -30,7 +30,8 @@ namespace ProjectEuler
             //LongestCollatzsSequence_14.Answer();
             //LatticePaths_15.Answer();
             //PowerDigitSum_16.Answer();
-            NumberLetterCounts_17.Answer();
+            //NumberLetterCounts_17.Answer();
+            MaximumPathSum_18.Answer();
             Console.Read();
         }
     }
@@ -601,7 +602,7 @@ namespace ProjectEuler
 
     internal class NumberLetterCounts_17
     {
-        private Dictionary<int, int> LettersPerNumber = new Dictionary<int, int>
+        private readonly static Dictionary<int, int> LettersPerNumber = new Dictionary<int, int>
         {
             {1, "one".Length},
             {2, "two".Length},
@@ -615,19 +616,71 @@ namespace ProjectEuler
             {10, "ten".Length},
             {11, "eleven".Length},
             {12, "twelve".Length},
-            {13, "thirteen".Length}
+            {13, "thirteen".Length},
+            {14, "fourteen".Length },
+            {15, "fifteen".Length },
+            {16, "sixteen".Length },
+            {17, "seventeen".Length },
+            {18, "eighteen".Length },
+            {19, "nineteen".Length },
+            {20, "twenty".Length },
+            {30, "thirty".Length },
+            {40, "forty".Length },
+            {50, "fifty".Length },
+            {60, "sixty".Length },
+            {70, "seventy".Length },
+            {80, "eighty".Length },
+            {90, "ninety".Length },
         };
 
-        private static ulong CountLettersInNumber(uint number)
+        private static int CountLettersInNumber(int number)
         {
-            var total = 0ul;
+            var total = 0;
+            var numTest = 0;
+
+            if ((numTest = number%100) < 20 && numTest > 0)
+            {
+                total += LettersPerNumber[numTest];
+                number -= numTest;
+            }
+            else if((numTest = number % 10) > 0)
+            {
+                total += LettersPerNumber[numTest];
+                number -= numTest;
+            }
+
+            if ((numTest = number%100) > 0)
+            {
+                total += LettersPerNumber[numTest];
+                number -= numTest;
+            }
+
+            if ((numTest = number % 1000) > 0)
+            {
+                if (total > 0)
+                {
+                    total += "and".Length;
+                }
+                number -= numTest;
+                numTest /= 100;
+                total += LettersPerNumber[numTest] + "hundred".Length;
+            }
+
+            if (number > 0)
+            {
+                total += "onethousand".Length;
+            }
             
             return total;
         }
         public static void Answer()
         {
             var start = DateTime.Now;
-            var total = 212%20;
+            var total = 0;
+            for (var x = 1; x <= 1000; x++)
+            {
+                total += CountLettersInNumber(x);
+            }
             var endTime = DateTime.Now;
             var answerText =
                 $"Problem 16 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
@@ -635,6 +688,119 @@ namespace ProjectEuler
             Debug.WriteLine(answerText);
 
         }
+    }
+
+    internal class MaximumPathSum_18
+    {
+        public static void Answer()
+        {
+            var nums = new List<int>
+            {
+                75,
+                95, 64,
+                17, 47, 82,
+                18, 35, 87, 10,
+                20, 04, 82, 47, 65,
+                19, 01, 23, 75, 03, 34,
+                88, 02, 77, 73, 07, 63, 67,
+                99, 65, 04, 28, 06, 16, 70, 92,
+                41, 41, 26, 56, 83, 40, 80, 70, 33,
+                41, 48, 72, 33, 47, 32, 37, 16, 94, 29,
+                53, 71, 44, 65, 25, 43, 91, 52, 97, 51, 14,
+                70, 11, 33, 28, 77, 73, 17, 78, 39, 68, 17, 57,
+                91, 71, 52, 38, 17, 14, 91, 43, 58, 50, 27, 29, 48,
+                63, 66, 04, 68, 89, 53, 67, 30, 73, 16, 69, 87, 40, 31,
+                04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23
+            };
+
+            var start = DateTime.Now;
+            var tree = new Tree();
+            foreach (var val in nums)
+            {
+                tree.Add(val);
+            }
+            var answer = tree.Root.GetMaxSubtreePathTotal();
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 16 answer is '{answer}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+    }
+
+    class Tree
+    {
+        private readonly List<TreeNode> _treeList = new List<TreeNode>();
+        public TreeNode Root => _treeList.Count > 0 ? _treeList[0] : null;
+        private int _currentRowStart = 0;
+        private int _maxCurrentRowSize = 1;
+        public void Add(int value)
+        {
+            _treeList.Add(new TreeNode(value));
+            var currentSpot = _treeList.Count - 1;
+
+            if (_treeList.Count > _currentRowStart + _maxCurrentRowSize)
+            {
+                _currentRowStart += _maxCurrentRowSize++;
+            }
+
+            var leftParent = currentSpot > _currentRowStart ? _treeList[currentSpot - _maxCurrentRowSize] : null;
+            var rightParent = currentSpot < _currentRowStart + _maxCurrentRowSize - 1 ? _treeList[currentSpot - _maxCurrentRowSize + 1] : null;
+
+            if (leftParent != null)
+            {
+                leftParent.RightChild = _treeList[currentSpot];
+                _treeList[currentSpot].LeftParent = leftParent;
+            }
+
+            if (rightParent != null)
+            {
+                rightParent.LeftChild = _treeList[currentSpot];
+                _treeList[currentSpot].RightParent = rightParent;
+            }
+        }
+    }
+
+    class TreeNode
+    {
+        public TreeNode(int value)
+        {
+            Value = value;
+        }
+        public int Value { get; set; }
+        private int subTreeMax = -1;
+
+        public int GetMaxSubtreePathTotal()
+        {
+            if (subTreeMax != -1)
+            {
+                return subTreeMax;
+            }
+            if (LeftChild == null && RightChild == null)
+            {
+                subTreeMax = Value;
+                return subTreeMax;
+            }
+            if (LeftChild == null)
+            {
+                subTreeMax = Value + RightChild.GetMaxSubtreePathTotal();
+                return subTreeMax;
+            }
+            if (RightChild == null)
+            {
+                subTreeMax = Value + LeftChild.GetMaxSubtreePathTotal();
+                return subTreeMax;
+            }
+            var leftMax = LeftChild.GetMaxSubtreePathTotal();
+            var rightMax = RightChild.GetMaxSubtreePathTotal();
+
+            subTreeMax = Value + (leftMax > rightMax ? leftMax : rightMax);
+            return subTreeMax;
+        }
+        public TreeNode LeftChild { get; set; }
+        public TreeNode RightChild { get; set; }
+        public TreeNode LeftParent { get; set; }
+        public TreeNode RightParent { get; set; }
     }
 
     public struct U2DPoint
