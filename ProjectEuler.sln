@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectEuler", "ProjectEuler\ProjectEuler.csproj", "{9FCE9111-283C-4521-A85A-AFE27D114B82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EulerTests", "EulerTests\EulerTests.csproj", "{E99BB5C1-03E7-4336-BDE2-B3D66205D440}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9FCE9111-283C-4521-A85A-AFE27D114B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FCE9111-283C-4521-A85A-AFE27D114B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FCE9111-283C-4521-A85A-AFE27D114B82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E99BB5C1-03E7-4336-BDE2-B3D66205D440}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E99BB5C1-03E7-4336-BDE2-B3D66205D440}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E99BB5C1-03E7-4336-BDE2-B3D66205D440}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E99BB5C1-03E7-4336-BDE2-B3D66205D440}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

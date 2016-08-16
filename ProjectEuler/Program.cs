@@ -31,7 +31,11 @@ namespace ProjectEuler
             //LatticePaths_15.Answer();
             //PowerDigitSum_16.Answer();
             //NumberLetterCounts_17.Answer();
-            MaximumPathSum_18.Answer();
+            //MaximumPathSum_18_67.Answer();
+            //CountingSundays_19.Answer();
+            //FactorialDigitSum_20.Answer();
+            //AmicableNumbers_21.Answer();
+            NameScores_22.Answer();
             Console.Read();
         }
     }
@@ -683,18 +687,18 @@ namespace ProjectEuler
             }
             var endTime = DateTime.Now;
             var answerText =
-                $"Problem 16 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+                $"Problem 17 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
             Console.WriteLine(answerText);
             Debug.WriteLine(answerText);
 
         }
     }
 
-    internal class MaximumPathSum_18
+    internal class MaximumPathSum_18_67
     {
         public static void Answer()
         {
-            var nums = new List<int>
+            var prob18Nums = new List<int>
             {
                 75,
                 95, 64,
@@ -713,16 +717,207 @@ namespace ProjectEuler
                 04, 62, 98, 27, 23, 09, 70, 98, 73, 93, 38, 53, 60, 04, 23
             };
 
-            var start = DateTime.Now;
+            List<int> nums = null;
+            using (var streamReader = new StreamReader("ProblemSpecificFiles/EulerProblem67.txt"))
+            {
+                nums = streamReader.ReadToEnd().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList();
+            }
             var tree = new Tree();
             foreach (var val in nums)
             {
                 tree.Add(val);
             }
+            var start = DateTime.Now;
             var answer = tree.Root.GetMaxSubtreePathTotal();
             var endTime = DateTime.Now;
             var answerText =
-                $"Problem 16 answer is '{answer}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+                $"Problem 19 answer is '{answer}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+    }
+
+    enum Months
+    {
+        January = 1,
+        February,
+        March,
+        April,
+        May,
+        June,
+        July,
+        August,
+        September,
+        October,
+        November,
+        December
+    }
+    internal class CountingSundays_19
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            var day = 6;
+            var month = Months.January;
+            var year = 1901;
+            var firstSundays = 0;
+            var daysInMonth = GetDaysInMonth(month, year);
+            var loops = 0ul;
+
+            while (year < 2001)
+            {
+                loops++;
+                if (day + 7 <= daysInMonth)
+                {
+                    day += 7;
+                    continue;
+                }
+                else
+                {
+                    day = 7 - (daysInMonth - day);
+                    if (month == Months.December)
+                    {
+                        year++;
+                        month = Months.January;
+                    }
+                    else
+                    {
+                        month += 1;
+                    }
+                    daysInMonth = GetDaysInMonth(month, year);
+                }
+                if (day == 1)
+                {
+                    firstSundays++;
+                }
+            }
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 19 answer is '{firstSundays}'. There were {loops} loops. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+
+        public static int GetDaysInMonth(Months month, int year)
+        {
+            switch (month)
+            {
+                case Months.January:
+                case Months.March:
+                case Months.May:
+                case Months.July:
+                case Months.August:
+                case Months.October:
+                case Months.December:
+                    return 31;
+
+                case Months.April:
+                case Months.June:
+                case Months.September:
+                case Months.November:
+                    return 30;
+
+                case Months.February:
+                    if (year%400 == 0 || (year%4 == 0 && year%100 != 0))
+                    {
+                        return 29;
+                    }
+                    return 28;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(month));
+            }
+        }
+    }
+
+    internal class FactorialDigitSum_20
+    {
+        public static void Answer()
+        {
+            var num = new MyBigInt(100);
+            var start = DateTime.Now;
+            num.Factorial();
+            var answer = num.GetDigitSum();
+            var endTime = DateTime.Now;
+            var answerText =
+                $"Problem 20 answer is '{answer}'. Final num was was\n{num}.\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+    }
+
+    internal class AmicableNumbers_21
+    {
+        public static void Answer()
+        {
+            var sumOfTimes = 0L;
+            var answer = 0ul;
+            for (var count = 0; count < 100; count++)
+            {
+                var amicableNums = new bool[10000];
+                var start = DateTime.Now;
+                for (uint x = 4; x < 10000; x++)
+                {
+                    if (amicableNums[x])
+                    {
+                        continue;
+                    }
+                    var partner = MathHelpers.GetAmicablePartner(x);
+                    if (partner != 0)
+                    {
+                        amicableNums[x] = true;
+                        if (partner < 10000)
+                        {
+                            amicableNums[partner] = true;
+                        }
+                    }
+                }
+                
+                for (var x = 4; x < 10000; x++)
+                {
+                    if (amicableNums[x])
+                    {
+                        answer += (ulong) x;
+                    }
+                }
+                var endTime = DateTime.Now;
+                sumOfTimes += Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds);
+            }
+            var answerText =
+                $"Problem 21 answer is '{answer}'. Algorithm finished in {sumOfTimes/100} milliseconds on average";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+    }
+
+    internal class NameScores_22
+    {
+        public static void Answer()
+        {
+            //var sumOfTimes = 0L;
+            //for (var count = 0; count < 100; count++)
+            //{
+            var start = DateTime.Now;
+            List<string> nameStrings = null;
+            using (var streamReader = new StreamReader("ProblemSpecificFiles/EulerProblem22.txt"))
+            {
+                nameStrings =
+                    streamReader.ReadLine().Replace("\"", "")
+                        .Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                        .ToList();
+            }
+            nameStrings.Sort();
+
+            var answer = 0ul;
+            for (var x = 0; x < nameStrings.Count; x++)
+            {
+                answer += (uint)(x + 1)*TextHelpers.GetWordScore(nameStrings[x]);
+            }
+
+            var endTime = DateTime.Now;
+            //    sumOfTimes += Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds);
+
+            var answerText =
+                $"Problem 22 answer is '{answer}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
             Console.WriteLine(answerText);
             Debug.WriteLine(answerText);
         }
@@ -761,6 +956,7 @@ namespace ProjectEuler
         }
     }
 
+    
     class TreeNode
     {
         public TreeNode(int value)
@@ -814,7 +1010,7 @@ namespace ProjectEuler
         public ulong Y { get; set; }
     }
 
-    static class MathHelpers
+    public static class MathHelpers
     {
         public static int FindCollatzsLength(ulong originalNum, int[] numArray)
         {
@@ -864,14 +1060,16 @@ namespace ProjectEuler
                 list.Add(num);
             }
             ulong posDivisor = 2;
-            ulong sqrt = Convert.ToUInt64(Math.Sqrt(num));
 
-            while (posDivisor <= sqrt)
+            while (posDivisor*posDivisor <= num)
             {
                 if (num % posDivisor == 0)
                 {
                     list.Add(posDivisor);
-                    list.Add(num / posDivisor);
+                    if (posDivisor * posDivisor != num)
+                    {
+                        list.Add(num / posDivisor);
+                    }
                 }
                 posDivisor++;
             }
@@ -999,6 +1197,35 @@ namespace ProjectEuler
             {
                 return new[] { 2ul, 3ul, 5ul, 7ul, 11ul, 13ul, 17ul, 19ul, 23ul, 29ul, 31ul, 37ul };
             }
+        }
+
+        public static ulong GetAmicablePartner(ulong num)
+        {
+            if (num < 1)
+            {
+                return 0;
+            }
+
+            var factors = GetFactors(num).Where(n => n != num).ToList();
+
+            if (factors.Count < 2)
+            {
+                return 0;
+            }
+
+            var sum = factors.Aggregate(0ul, (current, total) => total + current);
+            if (sum == num)
+            {
+                return 0;
+            }
+            var sumFactors = GetFactors(sum).Where(n => n != sum).ToList();
+
+            if (sumFactors.Count < 2)
+            {
+                return 0;
+            }
+
+            return sumFactors.Aggregate(0ul, (current, total) => total + current) == num ? sum : 0;
         }
     }
 }
