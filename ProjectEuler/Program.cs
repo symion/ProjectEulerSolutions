@@ -35,7 +35,10 @@ namespace ProjectEuler
             //CountingSundays_19.Answer();
             //FactorialDigitSum_20.Answer();
             //AmicableNumbers_21.Answer();
-            NameScores_22.Answer();
+            //NameScores_22.Answer();
+            //NonAbundantSums_23.Answer();
+            //Thousand_DigitFibonacciNumber_25.Answer();
+            LexicoGraphicPermutations_24.Answer();
             Console.Read();
         }
     }
@@ -923,6 +926,89 @@ namespace ProjectEuler
         }
     }
 
+    internal class NonAbundantSums_23
+    {
+        public static void Answer()
+        {
+            var abundantNums = new SortedSet<ulong> {12};
+            var sumsOfAbundants = new SortedSet<ulong> {24};
+            var boolOFAbundants = new bool[28123];
+
+            var start = DateTime.Now;
+            var total = (12ul*13ul)/2;
+            for (var x = 13UL; x <= 28123; x++)
+            {
+                if (MathHelpers.GetPerfectionRating(x) == MathHelpers.PerfectionRating.Abundant)
+                {
+                    abundantNums.Add(x);
+                    foreach (var abundant in abundantNums.Where(a => x + a <= 28123))
+                    {
+                        //sumsOfAbundants.Add(x + abundant);
+                        boolOFAbundants[x + abundant - 1] = true;
+                    }
+                }
+                //if (!sumsOfAbundants.Contains(x))
+                if(!boolOFAbundants[x-1])
+                {
+                    total += x;
+                }
+            }
+            var endTime = DateTime.Now;
+            
+            var answerText =
+                $"Problem 23 answer is '{total}'. Algorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+
+    }
+
+    internal class LexicoGraphicPermutations_24
+    {
+        public static void Answer()
+        {
+            var set = new SortedSet<char> { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+            var start = DateTime.Now;
+            string answer = null;
+            for (int x = 0; x < 100; x++)
+            {
+                answer = MathHelpers.GetNthLexicographicPermutationOfS(set, 1000000);
+            }
+            var endTime = DateTime.Now;
+
+            var timeDif = Convert.ToDouble(endTime.Subtract(start).TotalMilliseconds);
+            var answerText =
+                $"Problem 23 answer is '{answer}'. Algorithm finished in {timeDif/100} milliseconds on average";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+        //GetNthLexicographicPermutationOfS
+    }
+
+    internal class Thousand_DigitFibonacciNumber_25
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            var fibIndex = 2;
+            var termA = new MyBigInt(1);
+            var termB = new MyBigInt(1);
+            while (termB.Base10Digits < 1000)
+            {
+                var holder = new MyBigInt(termB);
+                termB.Add(termA);
+                termA = holder;
+                ++fibIndex;
+            }
+            var endTime = DateTime.Now;
+
+            var answerText =
+                $"Problem 25 answer is '{fibIndex}'. Number was:\n'{termB}'\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+    }
+
     class Tree
     {
         private readonly List<TreeNode> _treeList = new List<TreeNode>();
@@ -1012,6 +1098,86 @@ namespace ProjectEuler
 
     public static class MathHelpers
     {
+        public enum PerfectionRating
+        {
+            Invalid = 0,
+            Deficient,
+            Perfect,
+            Abundant
+        }
+
+        public static string GetNthLexicographicPermutationOfS(SortedSet<char> characterSet, ulong permutation)
+        {
+            characterSet = new SortedSet<char>(characterSet); //make a copy
+            var outString = string.Empty;
+            var totalCount = characterSet.Count;
+            for (var count = 0; count < totalCount - 1; count++)
+            {
+                var nextPermutations = MyBigInt.Factorial((ulong) (totalCount - count - 1)).Cast<ulong>();
+                var nextSetIndex = 0;
+                while (permutation > nextPermutations)
+                {
+                    permutation -= nextPermutations;
+                    ++nextSetIndex;
+                }
+                var nextChar = characterSet.ElementAt(nextSetIndex);
+                outString += nextChar.ToString();
+                characterSet.Remove(nextChar);
+            }
+            outString += characterSet.First();
+            return outString;
+        }
+
+        public static PerfectionRating GetPerfectionRating(ulong num)
+        {
+            var sumOfFactors = SumOfProperFactors(num);
+
+            if (sumOfFactors > num)
+            {
+                return PerfectionRating.Abundant;
+            }
+
+            if (sumOfFactors == num)
+            {
+                return PerfectionRating.Perfect;
+            }
+
+            return PerfectionRating.Deficient;
+        }
+
+        public static ulong SumOfProperFactors(ulong num)
+        {
+            return SumOfFactors(num) - num;
+        }
+
+        public static ulong SumOfFactors(ulong num)
+        {
+            var sum = 1UL;
+            var nextPrime = 2UL;
+            while (nextPrime*nextPrime <= num && num > 1)
+            {
+                if (num%nextPrime == 0)
+                {
+                    var j = nextPrime*nextPrime;
+                    num /= nextPrime;
+                    while (num%nextPrime == 0)
+                    {
+                        j *= nextPrime;
+                        num /= nextPrime;
+                    }
+                    sum *= j - 1;
+                    sum /= nextPrime - 1;
+                }
+                nextPrime = (nextPrime == 2) ? 3 : nextPrime + 2;
+            }
+            if (num > 1)
+            {
+                sum *= (num + 1);
+            }
+
+            return sum;
+        }
+
         public static int FindCollatzsLength(ulong originalNum, int[] numArray)
         {
             var length = 1;

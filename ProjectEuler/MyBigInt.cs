@@ -41,6 +41,8 @@ namespace ProjectEuler
             _number.AddRange(cloneMe._number);
         }
 
+        public bool IsEven => (_number[0] & 1) == 0;
+
         public override string ToString()
         {
             var output = _number.ToList();
@@ -149,6 +151,51 @@ namespace ProjectEuler
             }
         }
 
+        public void Subtract(MyBigInt othernum)
+        {
+            if (!IsGreaterThanOrEqualTo(othernum))
+            {
+                throw new ArgumentOutOfRangeException(nameof(othernum), "Value would take us negative");
+            }
+
+            for (int x = 0; x < othernum._number.Count; x++)
+            {
+                if (_number[x] < othernum._number[x])
+                {
+                    _number[x + 1]--;
+                    _number[x] += 10;
+                }
+
+                _number[x] -= othernum._number[x];
+            }
+        }
+
+        public bool IsGreaterThanOrEqualTo(MyBigInt otherNum)
+        {
+            if (_number.Count > otherNum._number.Count)
+            {
+                return true;
+            }
+            if (_number.Count < otherNum._number.Count)
+            {
+                return false;
+            }
+
+            for (var x = _number.Count - 1; x >= 0; x--)
+            {
+                if (_number[x] < otherNum._number[x])
+                {
+                    return false;
+                }
+
+                if (_number[x] > otherNum._number[x])
+                {
+                    return true;
+                }
+            }
+            return true;
+        }
+
         private ulong ConvertToULong()
         {
             if (!FitsInULong())
@@ -174,6 +221,13 @@ namespace ProjectEuler
             throw new InvalidCastException($"Object does not support casting to type {typeof (T).Name}");
         }
 
+        public static MyBigInt Factorial(ulong num)
+        {
+            var bigInt = new MyBigInt(num);
+            bigInt.Factorial();
+            return bigInt;
+        }
+
         private void SumValueWithCarry(int index, byte addend)
         {
             var localIndex = index;
@@ -197,6 +251,8 @@ namespace ProjectEuler
                 localIndex++;
             } while (addend > 0);
         }
+
+        public int Base10Digits => _number.Count;
 
         public ulong GetDigitSum()
         {
