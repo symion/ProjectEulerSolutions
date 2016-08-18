@@ -38,7 +38,8 @@ namespace ProjectEuler
             //NameScores_22.Answer();
             //NonAbundantSums_23.Answer();
             //Thousand_DigitFibonacciNumber_25.Answer();
-            LexicoGraphicPermutations_24.Answer();
+            //LexicoGraphicPermutations_24.Answer();
+            ReciprocalCycles_26.Answer();
             Console.Read();
         }
     }
@@ -1006,6 +1007,99 @@ namespace ProjectEuler
                 $"Problem 25 answer is '{fibIndex}'. Number was:\n'{termB}'\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
             Console.WriteLine(answerText);
             Debug.WriteLine(answerText);
+        }
+    }
+
+    internal class ReciprocalCycles_26
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            var numWithLongestRepeat = 3;
+            var longestRepeat = new List<int> {3};
+            List<int> largestDecimalPart = null;
+            for (var x = 4; x < 1000; x++)
+            {
+                var decimalPart = new List<int>();
+                var mod = 10;
+                var padding = (int) Math.Log10(x);
+                var borrowCount = 1;
+
+                while (mod != 0)
+                {
+                    while (mod < x)
+                    {
+                        mod *= 10;
+                        if (++borrowCount > 1)
+                        {
+                            decimalPart.Add(0);
+                        }
+                    }
+                    borrowCount = 0;
+                    decimalPart.Add(mod/x);
+                    mod %= x;
+                    if (mod == 0)
+                    {
+                        break;
+                    }
+                    List<int> sequence;
+                    if (decimalPart.Count >= (padding+2) && FoundRepeatingSequence(padding, decimalPart, out sequence))
+                    {
+                        if (sequence.Count > longestRepeat.Count)
+                        {
+                            numWithLongestRepeat = x;
+                            longestRepeat = sequence;
+                            largestDecimalPart = decimalPart;
+                        }
+                        break;
+                    }
+                } 
+            }
+            var repeatString = string.Concat(longestRepeat.Select(n => n.ToString()));
+            var endTime = DateTime.Now;
+
+            var answerText =
+                $"Problem 26 answer is '{numWithLongestRepeat}'.\nDecimal part was\n'{string.Concat(largestDecimalPart.Select(n => n.ToString()))}'\nRepeat length was '{repeatString.Length}'.\nRepeat was:\n'{repeatString}'\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
+
+        private static bool FoundRepeatingSequence(int padding, List<int> decimalPart, out List<int> sequence)
+        {
+            sequence = null;
+            var searchList = decimalPart;
+            var decimalCount = searchList.Count;
+            if (decimalCount < 3)
+            {
+                return false;
+            }
+            var maxDecimalIndex = decimalCount - 1;
+            var testSequence = searchList.GetRange(maxDecimalIndex - (padding + 1), padding + 2);
+            
+            while (testSequence.Count <= searchList.Count/3)
+            {
+                var match = true;
+                for (int x = testSequence.Count - 1; x >= 0; x--)
+                {
+                    var distanceFromEnd = testSequence.Count - 1 - x;
+                    var secondSequenceIndex = maxDecimalIndex - testSequence.Count - distanceFromEnd;
+                    var firstSequenceIndex = maxDecimalIndex - (2*testSequence.Count) - distanceFromEnd;
+                    match = (testSequence[x] == searchList[secondSequenceIndex])
+                            && (testSequence[x] == searchList[firstSequenceIndex]);
+                    if (!match)
+                    {
+                        break;
+                    }
+                }
+                if (match)
+                {
+                    sequence = testSequence;
+                    return true;
+                }
+                testSequence.Insert(0, searchList[searchList.Count - 1 - testSequence.Count]);
+            }
+
+            return false;
         }
     }
 
