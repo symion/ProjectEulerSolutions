@@ -44,5 +44,13 @@ namespace EulerTests
                     MathHelpers.SumOfProperFactors(x));
             }
         }
+
+        [TestMethod]
+        public void TestMult()
+        {
+            var num = new MyBigInt(953);
+            num.Multiply(793);
+            Assert.AreEqual(953UL*793UL, num.Cast<ulong>());
+        }
     }
 }

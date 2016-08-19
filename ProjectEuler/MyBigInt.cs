@@ -279,5 +279,14 @@ namespace ProjectEuler
                 --nextMult;
             }
         }
+
+        public void Multiply(ulong mult)
+        {
+            var currentVal = new MyBigInt(this);
+            for (var addCount = 0ul; addCount < mult - 1; addCount++)
+            {
+                Add(currentVal);
+            }
+        }
     }
 }

@@ -39,7 +39,8 @@ namespace ProjectEuler
             //NonAbundantSums_23.Answer();
             //Thousand_DigitFibonacciNumber_25.Answer();
             //LexicoGraphicPermutations_24.Answer();
-            ReciprocalCycles_26.Answer();
+            //ReciprocalCycles_26.BetterAnswer();
+            NumberSpiralDiagonals_28.Answer();
             Console.Read();
         }
     }
@@ -1012,6 +1013,39 @@ namespace ProjectEuler
 
     internal class ReciprocalCycles_26
     {
+        public static void BetterAnswer()
+        {
+            var start = DateTime.Now;
+            var numWithLongestRepeat = 3;
+            var longestRepeat = 1;
+            for (var x = 7; x < 1000; x+=2)
+            {
+                if (x%5 == 0)
+                {
+                    continue;
+                }
+
+                var tensPower = 1;
+                var powerOfTen = new BigInteger(10);
+                while ((powerOfTen - 1)%x != 0)
+                {
+                    powerOfTen *= 10;
+                    ++tensPower;
+                }
+
+                if (tensPower > longestRepeat)
+                {
+                    longestRepeat = tensPower;
+                    numWithLongestRepeat = x;
+                }
+            }
+            var endTime = DateTime.Now;
+
+            var answerText =
+                $"Problem 26 answer is '{numWithLongestRepeat}'. Repeat length was '{longestRepeat}'.\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
+        }
         public static void Answer()
         {
             var start = DateTime.Now;
@@ -1076,16 +1110,16 @@ namespace ProjectEuler
             var maxDecimalIndex = decimalCount - 1;
             var testSequence = searchList.GetRange(maxDecimalIndex - (padding + 1), padding + 2);
             
-            while (testSequence.Count <= searchList.Count/3)
+            while (testSequence.Count <= searchList.Count/2) // /3)
             {
                 var match = true;
                 for (int x = testSequence.Count - 1; x >= 0; x--)
                 {
                     var distanceFromEnd = testSequence.Count - 1 - x;
                     var secondSequenceIndex = maxDecimalIndex - testSequence.Count - distanceFromEnd;
-                    var firstSequenceIndex = maxDecimalIndex - (2*testSequence.Count) - distanceFromEnd;
-                    match = (testSequence[x] == searchList[secondSequenceIndex])
-                            && (testSequence[x] == searchList[firstSequenceIndex]);
+                    //var firstSequenceIndex = maxDecimalIndex - (2*testSequence.Count) - distanceFromEnd;
+                    match = (testSequence[x] == searchList[secondSequenceIndex]);
+                           // && (testSequence[x] == searchList[firstSequenceIndex]);
                     if (!match)
                     {
                         break;
@@ -1100,6 +1134,41 @@ namespace ProjectEuler
             }
 
             return false;
+        }
+    }
+
+    internal class NumberSpiralDiagonals_28
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            var diagonal = 1001;
+            var additionalTerms = (diagonal - 1) / 2;
+            var total = 1;
+            var diagonalJTerm = 1;
+            var diagonalkTerm = 1;
+            var diagonallTerm = 1;
+            var diagonalmTerm = 1;
+            var j = 2;
+            var k = 4;
+            var l = 6;
+            var m = 8;
+
+            for (var count = 0; count < additionalTerms; count++)
+            {
+                diagonalJTerm += j + count*8;
+                diagonalkTerm += k + count*8;
+                diagonallTerm += l + count*8;
+                diagonalmTerm += m + count*8;
+                total += diagonalJTerm + diagonalkTerm + diagonallTerm + diagonalmTerm;
+            }
+
+            var endTime = DateTime.Now;
+
+            var answerText =
+                $"Problem 28 answer is '{total}'.\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+            Console.WriteLine(answerText);
+            Debug.WriteLine(answerText);
         }
     }
 
