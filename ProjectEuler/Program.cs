@@ -40,7 +40,9 @@ namespace ProjectEuler
             //Thousand_DigitFibonacciNumber_25.Answer();
             //LexicoGraphicPermutations_24.Answer();
             //ReciprocalCycles_26.BetterAnswer();
-            NumberSpiralDiagonals_28.Answer();
+            //QuadraticPrimes_27.TestMultiple();
+            //NumberSpiralDiagonals_28.Answer();
+            DistinctPowers_29.Answer();
             Console.Read();
         }
     }
@@ -559,7 +561,7 @@ namespace ProjectEuler
         private static ulong[,] _gridPaths;
         public static void Answer()
         {
-            var gridSize = 20u;
+            var gridSize = 3u;
             _gridPaths = new ulong[gridSize + 1, gridSize + 1];
             var start = DateTime.Now;
             var answer = GetPathsRecursive(gridSize, gridSize);
@@ -1137,6 +1139,95 @@ namespace ProjectEuler
         }
     }
 
+    internal class QuadraticPrimes_27
+    {
+        public static void TestMultiple()
+        {
+            var start = DateTime.Now;
+            for (var x = 0; x < 100; x++)
+            {
+                Answer();
+            }
+            var end = DateTime.Now;
+            var avgMilliseconds = (end - start).TotalMilliseconds/100;
+            System.Console.WriteLine($"Problem avg execution was {avgMilliseconds}ms.");
+        }
+        public static void Answer()
+        {
+            //var start = DateTime.Now;
+            var aForMaxPrimes = 0;
+            var bForMaxPrimes = 3;
+            var maxConsecutivePrimes = 0;
+            
+            for (var b = 3; b <= 1000; b += 2)
+            {
+                if (!MathHelpers.ProbablyPrimeMiller_Rabin((ulong) b))
+                {
+                    continue;
+                }
+
+                for (var a = 0; a < 1000; a++)
+                {
+                    var currentMax = FindNumConsecutivePrimes(a, b);
+                    if (currentMax > maxConsecutivePrimes)
+                    {
+                        aForMaxPrimes = a;
+                        bForMaxPrimes = b;
+                        maxConsecutivePrimes = currentMax;
+                    }
+
+                    currentMax = FindNumConsecutivePrimes(-a, b);
+                    if (currentMax > maxConsecutivePrimes)
+                    {
+                        aForMaxPrimes = -a;
+                        bForMaxPrimes = b;
+                        maxConsecutivePrimes = currentMax;
+                    }
+
+                    currentMax = FindNumConsecutivePrimes(a, -b);
+                    if (currentMax > maxConsecutivePrimes)
+                    {
+                        aForMaxPrimes = a;
+                        bForMaxPrimes = -b;
+                        maxConsecutivePrimes = currentMax;
+                    }
+
+                    currentMax = FindNumConsecutivePrimes(-a, -b);
+                    if (currentMax > maxConsecutivePrimes)
+                    {
+                        aForMaxPrimes = -a;
+                        bForMaxPrimes = -b;
+                        maxConsecutivePrimes = currentMax;
+                    }
+                }
+            }
+            //var endTime = DateTime.Now;
+
+            //var answerText =
+            //    $"Problem 27 answer is '{aForMaxPrimes * bForMaxPrimes}'.\nA was '{aForMaxPrimes}' and B was '{bForMaxPrimes}'.\nNumber of consecutive primes was '{maxConsecutivePrimes}.'\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+           // Console.WriteLine(answerText);
+           // Debug.WriteLine(answerText);
+        }
+
+        private static int FindNumConsecutivePrimes(int a, int b)
+        {
+            var consecutive = 0;
+            var n = 0;
+            var product = (n * n) + (a * n) + b;
+            var isPrime = product > 1 && MathHelpers.ProbablyPrimeMiller_Rabin((ulong) product);
+
+            while (isPrime)
+            {
+                ++consecutive;
+                ++n;
+                product = (n * n) + (a * n) + b;
+                isPrime = product > 1 && MathHelpers.ProbablyPrimeMiller_Rabin((ulong) product);
+            }
+
+            return consecutive;
+        }
+    }
+
     internal class NumberSpiralDiagonals_28
     {
         public static void Answer()
@@ -1169,6 +1260,110 @@ namespace ProjectEuler
                 $"Problem 28 answer is '{total}'.\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
             Console.WriteLine(answerText);
             Debug.WriteLine(answerText);
+        }
+    }
+
+    internal class DistinctPowers_29
+    {
+        public static void Answer()
+        {
+            var start = DateTime.Now;
+            const ulong maxA = 16;
+            var distinctTermArray = new ulong[maxA + 1];
+            using (var stream = new StreamWriter("c:/temp/euler.txt"))
+            {
+
+                //var list = new SortedSet<ulong>();
+
+                //for (var a = 2ul; a <= maxA; a++)
+                //{
+                //    for (var b = 2ul; b <= maxA; b++)
+                //    {
+                //        stream.WriteLine((ulong) Math.Pow(a, b));
+                //        list.Add((ulong) Math.Pow(a, b));
+                //    }
+                //}
+
+                //foreach (var value in list)
+                //{
+                //    stream.WriteLine(value);
+                //}
+
+                //stream.WriteLine($"Correct answer: {list.Count}");
+
+
+                var listOfLists = new List<SortedSet<ulong>>();
+
+                for (var count = 2ul; count <= maxA; count++)
+                {
+                    var currentList = new SortedSet<ulong>();
+                    listOfLists.Add(currentList);
+                    for (var exp = 2ul; exp <= maxA; exp++)
+                    {
+                        currentList.Add((ulong) Math.Pow(count, exp));
+                    }
+                }
+                // 2:0 4:2 8:6 16:14
+                var sixteenIntersect2 = new SortedSet<ulong>();
+                sixteenIntersect2.UnionWith(listOfLists[14]);
+                sixteenIntersect2.IntersectWith(listOfLists[0]);
+                var sixteenIntersect4 = new SortedSet<ulong>();
+                sixteenIntersect4.UnionWith(listOfLists[14]);
+                sixteenIntersect4.IntersectWith(listOfLists[2]);
+                var sixteenIntersect8 = new SortedSet<ulong>();
+                sixteenIntersect8.UnionWith(listOfLists[14]);
+                sixteenIntersect8.IntersectWith(listOfLists[6]);
+
+                stream.WriteLine(
+                    $"16 common with 2 is {sixteenIntersect2.Count} terms:\n{string.Concat(sixteenIntersect2.Select(t => $" {t}"))}");
+                stream.WriteLine(
+                    $"16 common with 4 is {sixteenIntersect4.Count} terms:\n{string.Concat(sixteenIntersect4.Select(t => $" {t}"))}");
+                stream.WriteLine(
+                    $"16 common with 8 is {sixteenIntersect8.Count} terms:\n{string.Concat(sixteenIntersect8.Select(t => $" {t}"))}");
+                //stream.WriteLine($"2 had {listOfLists[0].Count} unique exponenents");
+                //stream.WriteLine($"4 had {listOfLists[2].UnionWith(listOfLists[0]).Cou} unique exponenents");
+
+                //for (var num = 2u; num <= maxA; num++)
+                //{
+                //    if (distinctTermArray[num] > 0)
+                //    {
+                //        continue;
+                //    }
+
+                //    distinctTermArray[num] = maxA - 1;
+
+                //    // Find out the number of unique terms fr each power of a less than maxA
+                //    var power = num*num;
+                //    var exponent = 2ul;
+                //    while (power <= maxA)
+                //    {
+                //        //distinctTermArray[power] = maxA;
+
+                //        //for (var expCount = 2ul; expCount < exponent; expCount++)
+                //        //{
+                //        //    distinctTermArray[power] = (uint)((maxA) - (maxA / expCount));
+                //        //}
+                //        distinctTermArray[power] = maxA;
+                //        //Walk up the exponent chain subtracting out terms that are common with previous powers
+                //        for (var tempExp = exponent; tempExp > 0; tempExp--)
+                //        {
+                //            distinctTermArray[power] -= 
+                //        }
+
+
+                //        distinctTermArray[power] = (uint) ((maxA) - (maxA/exponent));
+                //        power *= num;
+                //        exponent++;
+                //    }
+                //}
+
+                //var answer = distinctTermArray.Aggregate(0ul, (total, value) => total + value);
+                //var endTime = DateTime.Now;
+                //var answerText =
+                //    $"Problem 29 answer is '{answer}'.\nAlgorithm finished in {Convert.ToInt64(endTime.Subtract(start).TotalMilliseconds)} milliseconds";
+                //stream.WriteLine(answerText);
+                //Debug.WriteLine(answerText);
+            }
         }
     }
 
